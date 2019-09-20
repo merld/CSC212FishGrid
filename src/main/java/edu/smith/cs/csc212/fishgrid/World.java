@@ -174,6 +174,12 @@ public class World {
 		return home;
 	}
 	
+	public FallingRock insertFallingRockRandomly() {
+		FallingRock f =new FallingRock(this);
+		insertRandomly(f);
+		return f;
+	}
+	
 	/**
 	 * Insert a new Snail at random into the world.
 	 * @return the snail!
@@ -235,12 +241,18 @@ public class World {
 	public static void objectsFollow(WorldObject target, List<? extends WorldObject> followers) {
 		// TODO(FishGrid) Comment this method!
 		// What is recentPositions?
+		/* recentPositions is a Deque used to remember where the player last was so that the 
+		 found fish know where to go when following */
 		// What is followers?
+		/* followers is a list of found fish taken in by objectsFollow to keep track of which
+		 fish are supposed to be following the player and its indices are used to make those fish
+		 move*/
 		// What is target?
-		// Why is past = putWhere[i+1]? Why not putWhere[i]?
+		/* target is the player. It's used here to give the following fish their future/present destinations */
+		// TODO Why is past = putWhere[i+1]? Why not putWhere[i]?
 		List<IntPoint> putWhere = new ArrayList<>(target.recentPositions);
 		for (int i=0; i < followers.size() && i+1 < putWhere.size(); i++) {
-			// What is the deal with the two conditions in this for-loop?
+			// TODO What is the deal with the two conditions in this for-loop?
 			IntPoint past = putWhere.get(i+1);
 			followers.get(i).setPosition(past.x, past.y);
 		}

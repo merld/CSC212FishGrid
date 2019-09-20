@@ -33,10 +33,15 @@ public class FishGame {
 	 */
 	List<Fish> found;
 	
+	Snail snail;
+	
 	/**
 	 * Number of steps!
 	 */
 	int stepsTaken;
+	
+	//Number of rocks
+	public static final int ROCKNUM=7;
 	
 	/**
 	 * Score!
@@ -50,20 +55,18 @@ public class FishGame {
 	 */
 	public FishGame(int w, int h) {
 		world = new World(w, h);
-		
 		missing = new ArrayList<Fish>();
 		found = new ArrayList<Fish>();
 		
 		// Add a home!
 		home = world.insertFishHome();
 		
-		// TODO(lab) Generate some more rocks!
-		// TODO(lab) Make 5 into a constant, so it's easier to find & change.
-		for (int i=0; i<5; i++) {
+
+		for (int i=0; i<ROCKNUM; i++) {
 			world.insertRockRandomly();
 		}
-		
-		// TODO(lab) Make the snail!
+		world.insertFallingRockRandomly();
+		world.insertSnailRandomly();
 		
 		// Make the player out of the 0th fish color.
 		player = new Fish(0, world);
@@ -117,8 +120,7 @@ public class FishGame {
 				missing.remove(wo);
 				
 				// Remove from world.
-				// TODO(lab): add to found instead! (So we see objectsFollow work!)
-				world.remove(wo);
+				found.add((Fish) wo);
 				
 				// Increase score when you find a fish!
 				score += 10;
@@ -140,9 +142,12 @@ public class FishGame {
 		Random rand = ThreadLocalRandom.current();
 		for (Fish lost : missing) {
 			// 30% of the time, lost fish move randomly.
-			if (rand.nextDouble() < 0.3) {
-				// TODO(lab): What goes here?
+			if(lost.getColorIndex()==5&&rand.nextDouble()<0.8)
+				lost.moveRandomly();
+			else if (rand.nextDouble() < 0.3) {
+				lost.moveRandomly();
 			}
+			
 		}
 	}
 
