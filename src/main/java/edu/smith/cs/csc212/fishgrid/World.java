@@ -203,20 +203,19 @@ public class World {
 			return false;
 		}
 		
-		// This will be important.
 		boolean isPlayer = whoIsAsking.isPlayer();
 		
 		// We will need to look at who all is in the spot to determine if we can move there.
 		List<WorldObject> inSpot = this.find(x, y);
 		
+		//checks for obstacles
 		for (WorldObject it : inSpot) {
-			// TODO(FishGrid): Don't let us move over rocks as a Fish.
-			// The other fish shouldn't step "on" the player, the player should step on the other fish.
-			if (it instanceof Snail) {
-				// This if-statement doesn't let anyone step on the Snail.
-				// The Snail(s) are not gonna take it.
+			if(it instanceof Rock)
 				return false;
-			}
+			else if(it instanceof Fish &&!isPlayer)
+				return false;
+			else if (it instanceof Snail)
+				return false;
 		}
 		
 		// If we didn't see an obstacle, we can move there!
@@ -224,7 +223,7 @@ public class World {
 	}
 	
 	/**
-	 * This is how objects may move. Only Snails do right now.
+	 * This is how objects may move. 
 	 */
 	public void stepAll() {
 		for (WorldObject it : this.items) {
@@ -239,20 +238,24 @@ public class World {
 	 * @param followers a set of objects to follow the leader.
 	 */
 	public static void objectsFollow(WorldObject target, List<? extends WorldObject> followers) {
-		// TODO(FishGrid) Comment this method!
 		// What is recentPositions?
-		/* recentPositions is a Deque used to remember where the player last was so that the 
+		/* recentPositions is a Deque used to remember where the player last was (index 0) so that the 
 		 found fish know where to go when following */
 		// What is followers?
 		/* followers is a list of found fish taken in by objectsFollow to keep track of which
-		 fish are supposed to be following the player and its indices are used to make those fish
-		 move*/
+		 fish are supposed to be following the player and we can loop through it to make the following fish
+		 move to the correct position in recentPositions. */
 		// What is target?
 		/* target is the player. It's used here to give the following fish their future/present destinations */
-		// TODO Why is past = putWhere[i+1]? Why not putWhere[i]?
+		// Why is past = putWhere[i+1]? Why not putWhere[i]?
+		/* putWhere[i] points to index 0 of recentPositions which is where the player is currently. It needs
+		   to be past=putWhere.get(i+1) because that is where the player was last, not where they are now. */
 		List<IntPoint> putWhere = new ArrayList<>(target.recentPositions);
 		for (int i=0; i < followers.size() && i+1 < putWhere.size(); i++) {
-			// TODO What is the deal with the two conditions in this for-loop?
+			//  What is the deal with the two conditions in this for-loop?
+			/* The conditions are put in place to avoid a NullPointer Exception. If i is bigger or equal to
+			   the size of followers, the loop will crash. Because we need to be looking at putWhere[i+1] 
+			   for positions, i+1 cannot be greater or equal to putWhere.size(). */
 			IntPoint past = putWhere.get(i+1);
 			followers.get(i).setPosition(past.x, past.y);
 		}

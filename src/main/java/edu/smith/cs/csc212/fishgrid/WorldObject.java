@@ -277,6 +277,7 @@ public abstract class WorldObject {
 	 * @param g Graphics2D API.
 	 */
 	public abstract void draw(Graphics2D g);
+	public abstract int getColorIndex();
 
 	/**
 	 * Step this WorldObject!

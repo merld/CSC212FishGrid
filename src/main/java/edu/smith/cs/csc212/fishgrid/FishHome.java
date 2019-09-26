@@ -58,5 +58,6 @@ public class FishHome extends WorldObject {
 	public void step() {
 		// Fish home doesn't move, does it?
 	}
+	public int getColorIndex() {return -1;}
 
 }

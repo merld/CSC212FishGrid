@@ -22,7 +22,6 @@ public class Fish extends WorldObject {
 			Color.orange,
 			Color.blue,
 			Color.magenta
-			// TODO: (FishGrid) Maybe make a special fish that is more points?
 	};
 	/**
 	 * This is an index into the {@link #COLORS} array.
@@ -32,6 +31,9 @@ public class Fish extends WorldObject {
 	 * Whether or not this is the player;
 	 */
 	boolean player = false;
+	
+	//For how many steps has fish followed the player?
+	int steps;
 	
 	/**
 	 * Called only on the Fish that is the player!
@@ -49,6 +51,7 @@ public class Fish extends WorldObject {
 	public Fish(int color, World world) {
 		super(world);
 		this.color = color;
+		steps = 0;
 	}
 	
 	/**
@@ -58,6 +61,7 @@ public class Fish extends WorldObject {
 	public Color getColor() {
 		return COLORS[this.color];
 	}
+	// @return index of the color in the array to check if it's pink(fastScared and 25 points)
 	public int getColorIndex() {return color;}
 	/**
 	 * Animate our fish by facing left and then right over time.
@@ -111,4 +115,8 @@ public class Fish extends WorldObject {
 	public void step() {
 		// Fish are controlled at a higher level; see FishGame.
 	}
+	//getters and setters to allow fish to defect from the line when they've been there too long
+	public void addStep() {steps++;	}
+	public int getSteps() {return steps;}
+	public void resetSteps() {steps=0;}
 }

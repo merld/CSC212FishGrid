@@ -28,7 +28,7 @@ public class Rock extends WorldObject {
 			new Color(72,60,50)
 	};
 	
-	// TODO(lab): introduce a variable that is part of the class (one per Rock object) here that indexes the ROCK_COLORS array.
+	//Keeps track of what color rock is so it doesn't keep changing
 	int color;
 	/**
 	 * Construct a Rock in our world.
@@ -56,5 +56,6 @@ public class Rock extends WorldObject {
 	public void step() {
 		// Rocks don't actually *do* anything.		
 	}
+	public int getColorIndex() {return color;}
 
 }

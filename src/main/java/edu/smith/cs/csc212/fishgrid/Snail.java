@@ -113,5 +113,6 @@ public class Snail extends WorldObject {
 			}
 		}
 	}
+	public int getColorIndex() {return -1;}
 
 }

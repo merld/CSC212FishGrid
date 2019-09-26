@@ -33,6 +33,10 @@ public class FishGame {
 	 */
 	List<Fish> found;
 	
+	//These are the fish returned to home!
+	List<Fish> atHome;
+	
+	//This is a snail.
 	Snail snail;
 	
 	/**
@@ -55,16 +59,21 @@ public class FishGame {
 	 */
 	public FishGame(int w, int h) {
 		world = new World(w, h);
+		
+		//Declaring lists to keep track of fish
 		missing = new ArrayList<Fish>();
 		found = new ArrayList<Fish>();
+		atHome = new ArrayList<Fish>();
 		
 		// Add a home!
 		home = world.insertFishHome();
 		
-
+		//Add rocks!
 		for (int i=0; i<ROCKNUM; i++) {
 			world.insertRockRandomly();
 		}
+		
+		//Add a falling rock and a snail!
 		world.insertFallingRockRandomly();
 		world.insertSnailRandomly();
 		
@@ -96,8 +105,10 @@ public class FishGame {
 	 * @return true if the player has won (or maybe lost?).
 	 */
 	public boolean gameOver() {
-		// TODO(FishGrid) We want to bring the fish home before we win!
-		return missing.isEmpty();
+		//Makes sure all fish are home before the win
+		if(missing.isEmpty()&&atHome.size()==Fish.COLORS.length-1)
+			return true;
+		return false;
 	}
 
 	/**
@@ -106,12 +117,25 @@ public class FishGame {
 	public void step() {
 		// Keep track of how long the game has run.
 		this.stepsTaken += 1;
-				
+			
+		//Updates other fish steps
+		for(Fish fish: found) {
+			fish.addStep();
+		}
+		
+		//checks to see if fish need to leave found
+		for(int i =found.size()-1;i>0;i--) {
+			if(found.get(i).getSteps()>=20&&(int)(Math.random()*10)<8) {
+				found.get(i).resetSteps();
+				missing.add(found.get(i));
+				found.remove(i);
+			}
+		}
+		
 		// These are all the objects in the world in the same cell as the player.
 		List<WorldObject> overlap = this.player.findSameCell();
 		// The player is there, too, let's skip them.
 		overlap.remove(this.player);
-		
 		// If we find a fish, remove it from missing.
 		for (WorldObject wo : overlap) {
 			// It is missing if it's in our missing list.
@@ -119,14 +143,27 @@ public class FishGame {
 				// Remove this fish from the missing list.
 				missing.remove(wo);
 				
-				// Remove from world.
+				// Adds to found
 				found.add((Fish) wo);
 				
-				// Increase score when you find a fish!
-				score += 10;
+				//faster fish is 25 points and all others are 10 points
+				if(wo.getColorIndex()==5)
+					score+=25;
+				else
+					score += 10;
+			}
+			//Puts all found fish in atHome and removes from world
+			else if(wo instanceof FishHome) {
+				for(Fish f: found)
+					atHome.add(f);
+				for(int i=found.size()-1;i>=0;i--) {
+					world.remove(found.get(i));
+					found.remove(i);
+				}
+				
 			}
 		}
-		
+				
 		// Make sure missing fish *do* something.
 		wanderMissingFish();
 		// When fish get added to "found" they will follow the player around.
@@ -141,12 +178,24 @@ public class FishGame {
 	private void wanderMissingFish() {
 		Random rand = ThreadLocalRandom.current();
 		for (Fish lost : missing) {
-			// 30% of the time, lost fish move randomly.
+			// 80% of the time, fastScared fish move randomly
 			if(lost.getColorIndex()==5&&rand.nextDouble()<0.8)
 				lost.moveRandomly();
-			else if (rand.nextDouble() < 0.3) {
-				lost.moveRandomly();
-			}
+			// 30% of the time, lost normal fish move randomly.
+			else if (rand.nextDouble() < 0.3) 
+				lost.moveRandomly();	
+		}
+		
+		//If lost fish accidentally goes home, they are counted as atHome
+		for(int i =missing.size()-1; i>=0;i--) {
+			List<WorldObject> overlap2 = missing.get(i).findSameCell();
+			overlap2.remove(missing.get(i));
+			for(WorldObject thing: overlap2)
+				if(thing instanceof FishHome) {
+					atHome.add(missing.get(i));
+					world.remove(missing.get(i));
+					missing.remove(i);
+				}
 			
 		}
 	}
@@ -157,10 +206,12 @@ public class FishGame {
 	 * @param y - the y-tile.
 	 */
 	public void click(int x, int y) {
-		// TODO(FishGrid) use this print to debug your World.canSwim changes!
 		System.out.println("Clicked on: "+x+","+y+ " world.canSwim(player,...)="+world.canSwim(player, x, y));
 		List<WorldObject> atPoint = world.find(x, y);
-		// TODO(FishGrid) allow the user to click and remove rocks.
+		for(WorldObject it: atPoint) {
+			if(it instanceof Rock)
+				world.remove(it);
+		}
 
 	}
 	
